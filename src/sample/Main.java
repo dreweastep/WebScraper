@@ -1,6 +1,9 @@
 package sample;
 
 
+import javafx.scene.Group;
+import javafx.scene.image.Image;
+import javafx.stage.StageStyle;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -28,9 +31,14 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root, 600, 450));
+        primaryStage.setTitle("My Setlist Lookup");
+        primaryStage.setScene(new Scene(root, 872, 581));
+        primaryStage.getIcons().add(new Image("Icon.png"));
         primaryStage.show();
+
+        //Initialize css
+        Scene scene = new Scene(new Group(), 872, 581);
+        scene.getStylesheets().add("path/stylesheet.css");
     }
 
 

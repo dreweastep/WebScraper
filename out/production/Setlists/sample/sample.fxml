@@ -1,16 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="613.0" prefWidth="870.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="870.0" style="-fx-border-color: #000000;" xmlns="http://javafx.com/javafx/10" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ImageView fitHeight="180.0" fitWidth="293.0" layoutX="314.0" layoutY="193.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../Images/maxresdefault.jpg" />
-         </image>
-      </ImageView>
+      <TabPane prefHeight="580.0" prefWidth="870.0" style="-fx-border-color: #000000;" stylesheets="@stylesheet.css" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="Home">
+               <content>
+                  <AnchorPane prefWidth="880.0">
+                     <children>
+                        <ImageView fitHeight="616.0" fitWidth="880.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../Images/background.jpg" />
+                           </image>
+                        </ImageView>
+                        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#fdfeff" height="87.0" layoutX="50.0" layoutY="76.0" stroke="BLACK" strokeType="INSIDE" width="790.0" />
+                        <Button id="glass-grey" layoutX="344.0" layoutY="234.0" mnemonicParsing="false" prefHeight="58.0" prefWidth="210.0" stylesheets="@stylesheet.css" text="Search Setlists">
+                           <font>
+                              <Font name="Calisto MT" size="22.0" />
+                           </font></Button>
+                        <Label layoutX="55.0" layoutY="77.0" prefHeight="82.0" prefWidth="786.0" text="Concert Setlist Searcher" textAlignment="CENTER" underline="true">
+                           <font>
+                              <Font name="Bodoni MT Black" size="64.0" />
+                           </font>
+                        </Label>
+                        <Button id="glass-grey" layoutX="344.0" layoutY="316.0" mnemonicParsing="false" prefHeight="58.0" prefWidth="210.0" stylesheets="@stylesheet.css" text="View Saved Arists">
+                           <font>
+                              <Font name="Calisto MT" size="22.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+          <Tab text="Statistics" />
+        </tabs>
+      </TabPane>
    </children>
 </AnchorPane>

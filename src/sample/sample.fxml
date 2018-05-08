@@ -4,27 +4,32 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="870.0" style="-fx-border-color: #000000;" xmlns="http://javafx.com/javafx/10" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="870.0" style="-fx-border-color: #000000;" xmlns="http://javafx.com/javafx/10" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
    <children>
-      <TabPane prefHeight="580.0" prefWidth="870.0" style="-fx-border-color: #000000;" stylesheets="@stylesheet.css" tabClosingPolicy="UNAVAILABLE">
+      <TabPane fx:id="tabPane" style="-fx-border-color: #000000;" stylesheets="@stylesheet.css" tabClosingPolicy="UNAVAILABLE">
         <tabs>
-          <Tab text="Home">
+          <Tab fx:id="homeTab" text="Home">
                <content>
                   <AnchorPane prefWidth="880.0">
                      <children>
-                        <ImageView fitHeight="616.0" fitWidth="880.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="616.0" fitWidth="880.0" layoutX="-11.0" layoutY="-10.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../Images/background.jpg" />
                            </image>
                         </ImageView>
                         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#fdfeff" height="87.0" layoutX="50.0" layoutY="76.0" stroke="BLACK" strokeType="INSIDE" width="790.0" />
-                        <Button id="glass-grey" layoutX="344.0" layoutY="234.0" mnemonicParsing="false" prefHeight="58.0" prefWidth="210.0" stylesheets="@stylesheet.css" text="Search Setlists">
+                        <Button id="glass-grey" fx:id="searchButton" layoutX="344.0" layoutY="234.0" mnemonicParsing="false" onAction="#ShowSearchTab" prefHeight="58.0" prefWidth="210.0" stylesheets="@stylesheet.css" text="Search Setlists">
                            <font>
                               <Font name="Calisto MT" size="22.0" />
                            </font></Button>
@@ -33,7 +38,7 @@
                               <Font name="Bodoni MT Black" size="64.0" />
                            </font>
                         </Label>
-                        <Button id="glass-grey" layoutX="344.0" layoutY="316.0" mnemonicParsing="false" prefHeight="58.0" prefWidth="210.0" stylesheets="@stylesheet.css" text="View Saved Arists">
+                        <Button id="glass-grey" fx:id="statsButton" layoutX="344.0" layoutY="316.0" mnemonicParsing="false" onAction="#ShowStatsTab" prefHeight="58.0" prefWidth="210.0" stylesheets="@stylesheet.css" text="View Saved Arists">
                            <font>
                               <Font name="Calisto MT" size="22.0" />
                            </font>
@@ -42,7 +47,95 @@
                   </AnchorPane>
                </content>
             </Tab>
-          <Tab text="Statistics" />
+            <Tab fx:id="statsTab" text="Statistics">
+               <content>
+                  <AnchorPane prefHeight="582.0" prefWidth="880.0">
+                     <children>
+                        <ImageView fitHeight="589.0" fitWidth="882.0" opacity="0.61" pickOnBounds="true">
+                           <image>
+                              <Image url="@../Images/background.jpg" />
+                           </image>
+                        </ImageView>
+                        <Button fx:id="homeButton2" layoutX="774.0" mnemonicParsing="false" onAction="#ShowHomeTab" prefHeight="54.0" prefWidth="94.0" stylesheets="@stylesheet.css" text="Home">
+                           <font>
+                              <Font size="23.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+            <Tab fx:id="searchTab" text="Search">
+               <content>
+                  <AnchorPane prefWidth="880.0">
+                     <children>
+                        <ImageView fitHeight="616.0" fitWidth="880.0" opacity="0.49" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../Images/background.jpg" />
+                           </image>
+                        </ImageView>
+                        <TableView fx:id="concertTable" layoutX="-2.0" layoutY="190.0" onMouseClicked="#SelectConcert" prefHeight="379.0" prefWidth="870.0" stylesheets="@stylesheet.css">
+                          <columns>
+                            <TableColumn fx:id="artistColumn" prefWidth="228.00005793571472" text="Artist" />
+                            <TableColumn fx:id="venueColumn" prefWidth="406.3999786376953" text="Venue" />
+                              <TableColumn fx:id="dateColumn" minWidth="0.0" prefWidth="227.20001220703125" text="Date" />
+                          </columns>
+                        </TableView>
+                        <TextField fx:id="artistField" layoutX="14.0" layoutY="124.0" promptText="Enter Artist Name">
+                           <font>
+                              <Font name="System Bold" size="26.0" />
+                           </font>
+                        </TextField>
+                        <Button id="glass-grey" layoutX="374.0" layoutY="125.0" mnemonicParsing="false" onAction="#SearchSetlists" prefHeight="54.0" prefWidth="134.0" stylesheets="@stylesheet.css" text="Search">
+                           <font>
+                              <Font name="Calisto MT" size="22.0" />
+                           </font>
+                        </Button>
+                        <Label layoutX="24.0" layoutY="14.0" text="Setlists">
+                           <font>
+                              <Font name="Franklin Gothic Heavy" size="70.0" />
+                           </font>
+                           <textFill>
+                              <LinearGradient endX="1.0" endY="1.0" startX="1.0" startY="1.0">
+                                 <stops>
+                                    <Stop color="BLACK" />
+                                    <Stop color="WHITE" offset="1.0" />
+                                 </stops>
+                              </LinearGradient>
+                           </textFill>
+                        </Label>
+                        <Button fx:id="homebutton1" layoutX="773.0" mnemonicParsing="false" onAction="#ShowHomeTab" prefHeight="52.0" prefWidth="94.0" stylesheets="@stylesheet.css" text="Home">
+                           <font>
+                              <Font name="Calisto MT" size="22.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+            <Tab fx:id="statsTab1" text="Setlist">
+               <content>
+                  <AnchorPane prefHeight="582.0" prefWidth="880.0">
+                     <children>
+                        <ImageView fitHeight="589.0" fitWidth="882.0" opacity="0.61" pickOnBounds="true">
+                           <image>
+                              <Image url="@../Images/background.jpg" />
+                           </image>
+                        </ImageView>
+                        <Button fx:id="homeButton2" layoutX="774.0" mnemonicParsing="false" onAction="#ShowHomeTab" prefHeight="54.0" prefWidth="94.0" stylesheets="@stylesheet.css" text="Home">
+                           <font>
+                              <Font size="23.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="backButton" mnemonicParsing="false" onAction="#ShowSearchTab" prefHeight="54.0" prefWidth="124.0" stylesheets="@stylesheet.css" text="&lt;-- Back">
+                           <font>
+                              <Font size="23.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
         </tabs>
       </TabPane>
    </children>

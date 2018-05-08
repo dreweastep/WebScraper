@@ -1,6 +1,8 @@
 package sample;
 
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.stage.StageStyle;
@@ -15,6 +17,8 @@ import java.io.IOException;
 import java.awt.Desktop;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import javafx.application.Application;
@@ -47,17 +51,51 @@ public class Main extends Application {
     }
 
 
-    private static Document SearchArtist() {
-        Scanner in = new Scanner(System.in);
+    public static Document SearchArtist(String artist) {
         Document doc = null;
-
-        System.out.println("Welcome to the setlist searcher. Please enter a name of an artist: ");
-
         try {
-            doc = Jsoup.connect("https://www.setlist.fm/search?query=" + in.nextLine()).get();
+            doc = Jsoup.connect("https://www.setlist.fm/search?query=" + artist).get();
         } catch (IOException e) {
             e.printStackTrace();
         }
         return doc;
+    }
+
+    public static Document GetConcertByDate(String date, Document currentDoc) {
+        Document doc = null;
+
+        String[] dates = date.split("/");
+
+        Elements myElements = currentDoc.getElementsByClass("col-xs-12 setlistPreview");
+
+        for (Element item : myElements) {
+            if (item.toString().contains(dates[0]) && item.toString().contains(dates[1]) && item.toString().contains(dates[2])) {
+                String url = "https://www.setlist.fm/" + item.select("a").attr("href");
+
+                try {
+                    doc = Jsoup.connect(url).get();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return doc;
+    }
+
+
+    public static ObservableList<Concert> GetConcerts(Document myDoc){
+        ObservableList<Concert> concertList = FXCollections.observableArrayList();
+        Elements myElements = myDoc.getElementsByClass("col-xs-12 setlistPreview");
+
+        for (Element item : myElements){
+            String artist = item.select("a").text().split("at ")[0];
+            String venue = item.select("a").text().split("at ")[1].split(artist)[0];
+            String date = item.select("div > div > span.month").text() +
+                    "/" + item.select("div > div > span.day").text() +
+                    "/" + item.select("div > div > span.year").text();
+
+            concertList.add(new Concert(artist, venue, date));
+        }
+        return concertList;
     }
 }

@@ -7,8 +7,11 @@
 .tab-pane .tab {
     -fx-background-color: #000000;
 }
+.table-column {
+    -fx-font-size: 15;
+}
 
-#glass-grey {
+#glass-grey { //style from www.http://fxexperience.com
     -fx-background-color:
         #c3c4c4,
         linear-gradient(#d6d6d6 50%, white 100%),

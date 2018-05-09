@@ -54,25 +54,44 @@ public class Main extends Application {
     }
 
 
-    public static Document SearchArtist(String artist) {
+    public static Document SearchArtist(String artist, PageCount page) {
         Document doc = null;
         try {
-            doc = Jsoup.connect("https://www.setlist.fm/search?query=" + artist).get();
+            if (page.getCount() == 0) {
+                doc = Jsoup.connect("https://www.setlist.fm/search?query=" + artist).get();
+            }
+            else{
+                doc = Jsoup.connect("https://www.setlist.fm/search?page=" + page.getCount() + "&query=" + artist).get();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
         return doc;
     }
 
-    public static Document GetConcertByDate(String date, Document currentDoc) {
+    public static int GetLastPage(Document doc){
+        int lastPage = 0;
+        Elements liList = doc.getElementsByClass("listPagingNavigator text-center hidden-print").select("li");
+
+        for(Element li : liList){
+            try {
+                if (li.child(0).attr("title").equals("Go to last page")) {
+                    String num = li.child(0).text();
+                    lastPage = Integer.parseInt(num);
+                }
+            } catch (Exception e){}
+        }
+        System.out.println(lastPage);
+        return lastPage;
+    }
+
+    public static Document GetConcertByDate(String date, String artist, Document currentDoc) {
         Document doc = null;
-
         String[] dates = date.split("/");
-
         Elements myElements = currentDoc.getElementsByClass("col-xs-12 setlistPreview");
 
         for (Element item : myElements) {
-            if (item.toString().contains(dates[0]) && item.toString().contains(dates[1]) && item.toString().contains(dates[2])) {
+            if (item.toString().contains(dates[0]) && item.toString().contains(dates[1]) && item.toString().contains(dates[2]) && item.toString().contains(artist)) {
                 String url = "https://www.setlist.fm/" + item.select("a").attr("href");
                 try {
                     doc = Jsoup.connect(url).get();
@@ -85,6 +104,7 @@ public class Main extends Application {
     }
 
     public static String GetImageUrl(Document currentDoc) {
+        System.out.println(currentDoc.getElementsByClass("imageContent").first().select("img").attr("src"));
         return currentDoc.getElementsByClass("imageContent").first().select("img").attr("src");
     }
 

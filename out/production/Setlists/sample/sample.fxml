@@ -113,16 +113,17 @@
                   </AnchorPane>
                </content>
             </Tab>
-            <Tab fx:id="statsTab1" text="Setlist">
+            <Tab fx:id="setlistTab" text="Setlist">
                <content>
                   <AnchorPane prefHeight="582.0" prefWidth="880.0">
                      <children>
-                        <ImageView fitHeight="589.0" fitWidth="882.0" opacity="0.61" pickOnBounds="true">
+                        <ImageView fitHeight="616.0" fitWidth="880.0" opacity="0.49" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../Images/background.jpg" />
                            </image>
                         </ImageView>
-                        <Button fx:id="homeButton2" layoutX="774.0" mnemonicParsing="false" onAction="#ShowHomeTab" prefHeight="54.0" prefWidth="94.0" stylesheets="@stylesheet.css" text="Home">
+                        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#e8ecf0" height="117.0" layoutX="438.0" layoutY="83.0" stroke="BLACK" strokeType="INSIDE" width="430.0" />
+                        <Button fx:id="homeButton3" layoutX="774.0" mnemonicParsing="false" onAction="#ShowHomeTab" prefHeight="54.0" prefWidth="94.0" stylesheets="@stylesheet.css" text="Home">
                            <font>
                               <Font size="23.0" />
                            </font>
@@ -132,6 +133,30 @@
                               <Font size="23.0" />
                            </font>
                         </Button>
+                        <TableView fx:id="songTable" layoutY="83.0" prefHeight="486.0" prefWidth="413.0">
+                          <columns>
+                            <TableColumn fx:id="songColumn" prefWidth="450.3999877691269" text="C1" />
+                          </columns>
+                        </TableView>
+                        <ImageView fx:id="artistPicture" fitHeight="300.0" fitWidth="349.0" layoutX="478.0" layoutY="229.0" pickOnBounds="true" preserveRatio="true" />
+                        <Label fx:id="artistLabel" layoutX="443.0" layoutY="83.0" text="Label">
+                           <font>
+                              <Font name="Calisto MT Bold" size="28.0" />
+                           </font>
+                           <textFill>
+                              <LinearGradient endX="1.0" endY="1.0" startX="1.0" startY="1.0">
+                                 <stops>
+                                    <Stop color="BLACK" />
+                                    <Stop color="WHITE" offset="1.0" />
+                                 </stops>
+                              </LinearGradient>
+                           </textFill>
+                        </Label>
+                        <Label fx:id="concertLabel" layoutX="443.0" layoutY="130.0" text="Label">
+                           <font>
+                              <Font name="Calisto MT Italic" size="19.0" />
+                           </font>
+                        </Label>
                      </children>
                   </AnchorPane>
                </content>

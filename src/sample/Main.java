@@ -1,6 +1,7 @@
 package sample;
 
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
@@ -15,8 +16,10 @@ import javax.print.Doc;
 import java.io.IOException;
 
 import java.awt.Desktop;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -71,7 +74,6 @@ public class Main extends Application {
         for (Element item : myElements) {
             if (item.toString().contains(dates[0]) && item.toString().contains(dates[1]) && item.toString().contains(dates[2])) {
                 String url = "https://www.setlist.fm/" + item.select("a").attr("href");
-
                 try {
                     doc = Jsoup.connect(url).get();
                 } catch (IOException e) {
@@ -82,6 +84,20 @@ public class Main extends Application {
         return doc;
     }
 
+    public static String GetImageUrl(Document currentDoc) {
+        return currentDoc.getElementsByClass("imageContent").first().select("img").attr("src");
+    }
+
+    public static ObservableList<String> GetSongs(Document myDoc) {
+        ObservableList<String> songList = FXCollections.observableArrayList();
+        Elements myElements = myDoc.getElementsByClass("songLabel");
+
+        for (int i = 0; i < myElements.size(); i++) {
+            songList.add(Integer.toString(i + 1) + ". " + myElements.get(i).text());
+        }
+
+        return songList;
+    }
 
     public static ObservableList<Concert> GetConcerts(Document myDoc){
         ObservableList<Concert> concertList = FXCollections.observableArrayList();

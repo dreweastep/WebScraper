@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.Rectangle;
 import org.jsoup.nodes.Document;
 
 import javax.print.Doc;
@@ -25,7 +26,8 @@ import javafx.beans.property.StringProperty;
 
 public class Controller {
     //DECLARATIONS
-    public PageCount page = new PageCount();
+    private PageCount page = new PageCount();
+    private ArrayList<String> favoriteArtists = new ArrayList<>();
 
     @FXML
     private TabPane tabPane;
@@ -82,6 +84,9 @@ public class Controller {
     private Button nextPageButton;
 
     @FXML
+    private Rectangle pageBackground;
+
+    @FXML
     void DecrementPageNum(ActionEvent event) {
         page.DecrementCount();
 
@@ -117,6 +122,24 @@ public class Controller {
         page.setLastPage(Main.GetLastPage(doc));
     }
 
+
+    @FXML
+    void SaveArtist(ActionEvent event) {
+        String artistName = artistLabel.getText();
+        favoriteArtists = Main.ReadDatabase();
+
+        if (!favoriteArtists.contains(artistName)){
+            favoriteArtists.add(artistName);
+            Main.CreateDatabase(favoriteArtists);
+            System.out.println("Added artist to favorites.");
+        }
+        else{
+            System.out.println("Artist is already in favorites list.");
+        }
+
+
+    }
+
     @FXML
     void ShowHomeTab(ActionEvent event) {
         tabPane.getSelectionModel().select(homeTab);
@@ -127,7 +150,10 @@ public class Controller {
         tabPane.getSelectionModel().select(searchTab);
         concertTable.getItems().clear();
         page.ResetCount();
+        pageBackground.setVisible(false);
         pageLabel.setVisible(false);
+        backPageButton.setVisible(false);
+        nextPageButton.setVisible(false);
     }
 
     @FXML
@@ -135,7 +161,7 @@ public class Controller {
         tabPane.getSelectionModel().select(statsTab);
     }
 
-    void InitializeConcertTable(ObservableList<Concert> list){
+    private void InitializeConcertTable(ObservableList<Concert> list){
         concertTable.getItems().clear();
         InitializePageLabel();
 
@@ -150,7 +176,7 @@ public class Controller {
         concertTable.setItems(list);
     }
 
-    void InitializeSongTable(ObservableList<String> list){
+    private void InitializeSongTable(ObservableList<String> list){
         songTable.getItems().clear();
         songColumn.setCellValueFactory(cellData ->
                 new ReadOnlyStringWrapper(cellData.getValue()));
@@ -159,8 +185,9 @@ public class Controller {
         songTable.setItems(list);
     }
 
-    void InitializePageLabel(){
+    private void InitializePageLabel(){
         int count = page.getCount();
+        pageBackground.setVisible(true);
         pageLabel.setVisible(true);
         pageLabel.setText("Page " + count);
         backPageButton.setVisible(true);

@@ -9,6 +9,7 @@ public class Concert {
     private final SimpleStringProperty venue;
     private final SimpleStringProperty date;
 
+
     Concert(String artist, String venue, String date){
 
         this.artist = new SimpleStringProperty(artist);

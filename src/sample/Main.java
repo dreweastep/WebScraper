@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.stage.StageStyle;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -32,6 +33,11 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Scanner;
+
+
+import java.net.URL;
+import java.sql.*;
+
 
 public class Main extends Application {
 
@@ -69,6 +75,65 @@ public class Main extends Application {
         return doc;
     }
 
+    public static ArrayList<String> ReadDatabase(){
+        ArrayList<String> favArtists = new ArrayList<>();
+
+        try {
+            String DB_URL = "jdbc:mysql://db4free.net:3306/drewconcerts";
+            String USERNAME = "dreweastep";
+            String PASSWORD = "Cp82UfOSriPJ0CfW";
+
+            java.sql.Connection MyConn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+
+            Statement stmt = MyConn.createStatement();
+            String select = "SELECT artist FROM ArtistTable";
+            ResultSet rs = stmt.executeQuery(select);
+
+            while (rs.next()) {
+                favArtists.add(rs.getString("artist"));
+            }
+            rs.close();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return favArtists;
+    }
+
+    public static void CreateDatabase(ArrayList<String> artistList) {
+        String DB_URL = "jdbc:mysql://db4free.net:3306/drewconcerts";
+        String USERNAME = "dreweastep";
+        String PASSWORD = "Cp82UfOSriPJ0CfW";
+
+        try {
+            java.sql.Connection MyConn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+
+            //Delete existing table
+            Statement drop_stmt = MyConn.createStatement();
+            String drop = "DROP TABLE ArtistTable";
+            drop_stmt.executeUpdate(drop);
+
+            //Create new table
+            Statement stmt = MyConn.createStatement();
+            String create = "CREATE TABLE ArtistTable " +
+                    " (num INTEGER not NULL, " +
+                    " artist VARCHAR(255), " +
+                    " PRIMARY KEY ( num ))";
+            stmt.executeUpdate(create);
+
+            //Write data to table
+            for (int num = 0; num < artistList.size(); num++){
+                String artist = artistList.get(num);
+                String insert = "INSERT INTO ArtistTable " +
+                        "VALUES ('"+num+"', '"+artist+"')";
+                stmt.executeUpdate(insert);
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
     public static int GetLastPage(Document doc){
         int lastPage = 0;
         Elements liList = doc.getElementsByClass("listPagingNavigator text-center hidden-print").select("li");
@@ -79,9 +144,8 @@ public class Main extends Application {
                     String num = li.child(0).text();
                     lastPage = Integer.parseInt(num);
                 }
-            } catch (Exception e){}
+            } catch (Exception e){ }
         }
-        System.out.println(lastPage);
         return lastPage;
     }
 
@@ -104,7 +168,6 @@ public class Main extends Application {
     }
 
     public static String GetImageUrl(Document currentDoc) {
-        System.out.println(currentDoc.getElementsByClass("imageContent").first().select("img").attr("src"));
         return currentDoc.getElementsByClass("imageContent").first().select("img").attr("src");
     }
 
@@ -115,7 +178,6 @@ public class Main extends Application {
         for (int i = 0; i < myElements.size(); i++) {
             songList.add(Integer.toString(i + 1) + ". " + myElements.get(i).text());
         }
-
         return songList;
     }
 

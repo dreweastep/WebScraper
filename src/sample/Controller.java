@@ -1,48 +1,37 @@
 package sample;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Cursor;
-import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 import org.jsoup.nodes.Document;
-
-import javax.print.Doc;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.List;
 import javafx.scene.image.*;
 
-import javafx.beans.property.StringProperty;
 
 public class Controller {
     //DECLARATIONS
     private PageCount page = new PageCount();
-    private ArrayList<String> favoriteArtists = new ArrayList<>();
 
     @FXML
     private TabPane tabPane;
 
-    @FXML
-    private Tab homeTab;
+        @FXML
+        private Tab homeTab;
 
-    @FXML
-    private Tab statsTab;
+        @FXML
+        private Tab favoritesTab;
 
-    @FXML
-    private Tab searchTab;
+        @FXML
+        private Tab searchTab;
 
-    @FXML
-    private Tab setlistTab;
+        @FXML
+        private Tab setlistTab;
 
     @FXML
     private TextField artistField;
@@ -64,6 +53,19 @@ public class Controller {
 
         @FXML
         private TableColumn<String, String> songColumn;
+
+
+    @FXML
+    private TableView<String> favArtistTable;
+
+        @FXML
+        private TableColumn<String, String> favArtistColumn;
+
+    @FXML
+    private TableView<String> favVenueTable;
+
+        @FXML
+        private TableColumn<String, String> favVenueColumn;
 
     @FXML
     private ImageView artistPicture;
@@ -87,7 +89,7 @@ public class Controller {
     private Rectangle pageBackground;
 
     @FXML
-    void DecrementPageNum(ActionEvent event) {
+    void DecrementPageNum() {
         page.DecrementCount();
 
         Document doc = Main.SearchArtist(artistField.getText(), page);
@@ -96,7 +98,7 @@ public class Controller {
     }
 
     @FXML
-    void IncrementPageNum(ActionEvent event) {
+    void IncrementPageNum() {
         try {
             page.IncrementCount();
             Document doc = Main.SearchArtist(artistField.getText(), page);
@@ -110,12 +112,12 @@ public class Controller {
     }
 
     @FXML
-    void ResetPageCount(KeyEvent event) {
+    void ResetPageCount() {
         page.ResetCount();
     }
 
     @FXML
-    void SearchSetlists(ActionEvent event) {
+    void SearchSetlists() {
         Document doc = Main.SearchArtist(artistField.getText(), page);
         ObservableList<Concert> table = Main.GetConcerts(doc);
         InitializeConcertTable(table);
@@ -124,29 +126,42 @@ public class Controller {
 
 
     @FXML
-    void SaveArtist(ActionEvent event) {
+    void SaveArtist() {
         String artistName = artistLabel.getText();
-        favoriteArtists = Main.ReadDatabase();
+         ArrayList<String> favoriteArtists = Main.ReadArtistDatabase();
 
         if (!favoriteArtists.contains(artistName)){
             favoriteArtists.add(artistName);
-            Main.CreateDatabase(favoriteArtists);
+            Main.CreateArtistDatabase(favoriteArtists);
             System.out.println("Added artist to favorites.");
         }
         else{
             System.out.println("Artist is already in favorites list.");
         }
-
-
     }
 
     @FXML
-    void ShowHomeTab(ActionEvent event) {
+    void SaveVenue() {
+        String venue = concertTable.getSelectionModel().getSelectedItem().venueProperty().getValue();
+        ArrayList<String> favoriteVenues = Main.ReadVenueDatabase();
+
+        if (!favoriteVenues.contains(venue)){
+            favoriteVenues.add(venue);
+            Main.CreateVenueDatabase(favoriteVenues);
+            System.out.println("Added venue to favorites.");
+        }
+        else{
+            System.out.println("Venue is already in favorites list.");
+        }
+    }
+
+    @FXML
+    void ShowHomeTab() {
         tabPane.getSelectionModel().select(homeTab);
     }
 
     @FXML
-    void ShowSearchTab(ActionEvent event) {
+    void ShowSearchTab() {
         tabPane.getSelectionModel().select(searchTab);
         concertTable.getItems().clear();
         page.ResetCount();
@@ -157,8 +172,13 @@ public class Controller {
     }
 
     @FXML
-    void ShowStatsTab(ActionEvent event) {
-        tabPane.getSelectionModel().select(statsTab);
+    void ShowFavoritesTab() {
+        tabPane.getSelectionModel().select(favoritesTab);
+        ObservableList<String> artistTable = FXCollections.observableArrayList(Main.ReadArtistDatabase());
+        InitializeArtistTable(artistTable);
+        ObservableList<String> venueTable = FXCollections.observableArrayList(Main.ReadVenueDatabase());
+        InitializeVenueTable(venueTable);
+
     }
 
     private void InitializeConcertTable(ObservableList<Concert> list){
@@ -185,6 +205,22 @@ public class Controller {
         songTable.setItems(list);
     }
 
+    private void InitializeArtistTable(ObservableList<String> list) {
+        favArtistTable.getItems().clear();
+        favArtistColumn.setCellValueFactory(cellData ->
+                new ReadOnlyStringWrapper(cellData.getValue()));
+
+        favArtistTable.setItems(list);
+    }
+
+    private void InitializeVenueTable(ObservableList<String> list) {
+        favVenueTable.getItems().clear();
+        favVenueColumn.setCellValueFactory(cellData ->
+                new ReadOnlyStringWrapper(cellData.getValue()));
+
+        favVenueTable.setItems(list);
+    }
+
     private void InitializePageLabel(){
         int count = page.getCount();
         pageBackground.setVisible(true);
@@ -203,14 +239,48 @@ public class Controller {
     }
 
     @FXML
+    void SearchArtists(MouseEvent event) {
+        if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) { //Needs a double click from the left mouse button
+            ShowSearchTab();
+            Document doc = Main.SearchArtist(favArtistTable.getSelectionModel().getSelectedItem(), page);
+            ObservableList<Concert> table = Main.GetConcerts(doc);
+            InitializeConcertTable(table);
+            page.setLastPage(Main.GetLastPage(doc));
+            tabPane.getSelectionModel().select(searchTab);
+            artistField.setText(favArtistTable.getSelectionModel().getSelectedItem());
+
+        }
+    }
+
+    @FXML
+    void SearchVenues(MouseEvent event) {
+        if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) { //Needs a double click from the left mouse button
+            ShowSearchTab();
+            Document doc = Main.SearchArtist(favVenueTable.getSelectionModel().getSelectedItem(), page);
+            ObservableList<Concert> table = Main.GetConcerts(doc);
+            InitializeConcertTable(table);
+            page.setLastPage(Main.GetLastPage(doc));
+            artistField.setText(favVenueTable.getSelectionModel().getSelectedItem());
+        }
+    }
+
+        @FXML
     void SelectConcert(MouseEvent event) {
         if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) { //Needs a double click from the left mouse button
             String date = concertTable.getSelectionModel().getSelectedItem().dateProperty().getValue();
             String artist = concertTable.getSelectionModel().getSelectedItem().artistProperty().getValue();
             Document oldDoc = Main.SearchArtist(artistField.getText(), page);
+            Document newDoc;
+            ObservableList<String> songTable;
+            newDoc = Main.GetConcertByDate(date, artist, oldDoc);
 
-            Document newDoc = Main.GetConcertByDate(date, artist, oldDoc);
-            ObservableList<String> songTable = Main.GetSongs(newDoc);
+            try {
+                songTable = Main.GetSongs(newDoc);
+            }
+            catch (Exception e){
+                newDoc = Main.GetConcertByDate(date, oldDoc);
+                songTable = Main.GetSongs(newDoc);
+            }
 
             String url = Main.GetImageUrl(newDoc);
             String defaultUrl = "https://images.wallpaperscraft.com/image/guitar_music_strings_bass_guitar_electric_guitar_82964_300x168.jpg";

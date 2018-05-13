@@ -1,41 +1,21 @@
 package sample;
 
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
-import javafx.stage.StageStyle;
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import javax.print.Doc;
 import java.io.IOException;
-
-import java.awt.Desktop;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
-import java.io.IOException;
-import java.util.Scanner;
-
-
-import java.net.URL;
 import java.sql.*;
 
 
@@ -75,7 +55,7 @@ public class Main extends Application {
         return doc;
     }
 
-    public static ArrayList<String> ReadDatabase(){
+    public static ArrayList<String> ReadArtistDatabase(){
         ArrayList<String> favArtists = new ArrayList<>();
 
         try {
@@ -100,7 +80,7 @@ public class Main extends Application {
         return favArtists;
     }
 
-    public static void CreateDatabase(ArrayList<String> artistList) {
+    public static void CreateArtistDatabase(ArrayList<String> artistList) {
         String DB_URL = "jdbc:mysql://db4free.net:3306/drewconcerts";
         String USERNAME = "dreweastep";
         String PASSWORD = "Cp82UfOSriPJ0CfW";
@@ -134,6 +114,65 @@ public class Main extends Application {
         }
     }
 
+    public static ArrayList<String> ReadVenueDatabase(){
+        ArrayList<String> favVenues= new ArrayList<>();
+
+        try {
+            String DB_URL = "jdbc:mysql://db4free.net:3306/drewconcerts";
+            String USERNAME = "dreweastep";
+            String PASSWORD = "Cp82UfOSriPJ0CfW";
+
+            java.sql.Connection MyConn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+
+            Statement stmt = MyConn.createStatement();
+            String select = "SELECT venue FROM VenueTable";
+            ResultSet rs = stmt.executeQuery(select);
+
+            while (rs.next()) {
+                favVenues.add(rs.getString("venue"));
+            }
+            rs.close();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return favVenues;
+    }
+
+    public static void CreateVenueDatabase(ArrayList<String> venueList) {
+        String DB_URL = "jdbc:mysql://db4free.net:3306/drewconcerts";
+        String USERNAME = "dreweastep";
+        String PASSWORD = "Cp82UfOSriPJ0CfW";
+
+        try {
+            java.sql.Connection MyConn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+
+            //Delete existing table
+            Statement drop_stmt = MyConn.createStatement();
+            String drop = "DROP TABLE VenueTable";
+            drop_stmt.executeUpdate(drop);
+
+            //Create new table
+            Statement stmt = MyConn.createStatement();
+            String create = "CREATE TABLE VenueTable " +
+                    " (num INTEGER not NULL, " +
+                    " venue VARCHAR(255), " +
+                    " PRIMARY KEY ( num ))";
+            stmt.executeUpdate(create);
+
+            //Write data to table
+            for (int num = 0; num < venueList.size(); num++){
+                String venue = venueList.get(num);
+                String insert = "INSERT INTO VenueTable " +
+                        "VALUES ('"+num+"', '"+venue+"')";
+                stmt.executeUpdate(insert);
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
     public static int GetLastPage(Document doc){
         int lastPage = 0;
         Elements liList = doc.getElementsByClass("listPagingNavigator text-center hidden-print").select("li");
@@ -144,7 +183,7 @@ public class Main extends Application {
                     String num = li.child(0).text();
                     lastPage = Integer.parseInt(num);
                 }
-            } catch (Exception e){ }
+            } catch (Exception e){}
         }
         return lastPage;
     }
@@ -156,6 +195,23 @@ public class Main extends Application {
 
         for (Element item : myElements) {
             if (item.toString().contains(dates[0]) && item.toString().contains(dates[1]) && item.toString().contains(dates[2]) && item.toString().contains(artist)) {
+                String url = "https://www.setlist.fm/" + item.select("a").attr("href");
+                try {
+                    doc = Jsoup.connect(url).get();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return doc;
+    }
+    public static Document GetConcertByDate(String date, Document currentDoc) {
+        Document doc = null;
+        String[] dates = date.split("/");
+        Elements myElements = currentDoc.getElementsByClass("col-xs-12 setlistPreview");
+
+        for (Element item : myElements) {
+            if (item.toString().contains(dates[0]) && item.toString().contains(dates[1]) && item.toString().contains(dates[2])) {
                 String url = "https://www.setlist.fm/" + item.select("a").attr("href");
                 try {
                     doc = Jsoup.connect(url).get();

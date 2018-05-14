@@ -21,6 +21,11 @@ import java.sql.*;
 
 public class Main extends Application {
 
+    /**
+     * Sets stage My Setlist Lookup and sets icon to music note
+     * @param primaryStage Window that contains application
+     * @throws Exception May fail to load properly
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
@@ -39,15 +44,20 @@ public class Main extends Application {
         launch(args);
     }
 
-
-    public static Document SearchArtist(String artist, PageCount page) {
+    /**
+     * Uses Jsoup to connect to document based off of search parameter
+     * @param query Creates url based off of search parameter
+     * @param page Gets current page count
+     * @return Document with setlist elements
+     */
+    public static Document SearchSetlist(String query, PageCount page) {
         Document doc = null;
         try {
             if (page.getCount() == 0) {
-                doc = Jsoup.connect("https://www.setlist.fm/search?query=" + artist).get();
+                doc = Jsoup.connect("https://www.setlist.fm/search?query=" + query).get();
             }
             else{
-                doc = Jsoup.connect("https://www.setlist.fm/search?page=" + page.getCount() + "&query=" + artist).get();
+                doc = Jsoup.connect("https://www.setlist.fm/search?page=" + page.getCount() + "&query=" + query).get();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -55,6 +65,10 @@ public class Main extends Application {
         return doc;
     }
 
+    /**
+     * Reads database table of favorite artists
+     * @return List of artists
+     */
     public static ArrayList<String> ReadArtistDatabase(){
         ArrayList<String> favArtists = new ArrayList<>();
 
@@ -80,6 +94,10 @@ public class Main extends Application {
         return favArtists;
     }
 
+    /**
+     * Creates database of favorite artists after deleting the current database
+     * @param artistList List of favorite artists
+     */
     public static void CreateArtistDatabase(ArrayList<String> artistList) {
         String DB_URL = "jdbc:mysql://db4free.net:3306/drewconcerts";
         String USERNAME = "dreweastep";
@@ -114,6 +132,10 @@ public class Main extends Application {
         }
     }
 
+    /**
+     * Reads database table of favorite venues
+     * @return List of venues
+     */
     public static ArrayList<String> ReadVenueDatabase(){
         ArrayList<String> favVenues= new ArrayList<>();
 
@@ -139,6 +161,10 @@ public class Main extends Application {
         return favVenues;
     }
 
+    /**
+     * Creates database of favorite venues after deleting the current database
+     * @param venueList List of favorite venues
+     */
     public static void CreateVenueDatabase(ArrayList<String> venueList) {
         String DB_URL = "jdbc:mysql://db4free.net:3306/drewconcerts";
         String USERNAME = "dreweastep";
@@ -173,6 +199,11 @@ public class Main extends Application {
         }
     }
 
+    /**
+     * Gets last page by searching for class value
+     * @param doc Webpage to get page count from
+     * @return Integer of last page based off the search parameter
+     */
     public static int GetLastPage(Document doc){
         int lastPage = 0;
         Elements liList = doc.getElementsByClass("listPagingNavigator text-center hidden-print").select("li");
@@ -188,6 +219,13 @@ public class Main extends Application {
         return lastPage;
     }
 
+    /**
+     * Gets concert by date and artist
+     * @param date Date of concert
+     * @param artist Name of artist
+     * @param currentDoc Document to parse
+     * @return Webpage of setlist
+     */
     public static Document GetConcertByDate(String date, String artist, Document currentDoc) {
         Document doc = null;
         String[] dates = date.split("/");
@@ -205,6 +243,13 @@ public class Main extends Application {
         }
         return doc;
     }
+
+    /**
+     * Overload method, because sometimes searching by date and artist fails based off of abnormal characters
+     * @param date Date of Concert
+     * @param currentDoc Document to parse
+     * @return Webpage of setlist
+     */
     public static Document GetConcertByDate(String date, Document currentDoc) {
         Document doc = null;
         String[] dates = date.split("/");
@@ -227,6 +272,11 @@ public class Main extends Application {
         return currentDoc.getElementsByClass("imageContent").first().select("img").attr("src");
     }
 
+    /**
+     * Gets list of songs played at concert
+     * @param myDoc Webpage of setlist
+     * @return List of songs played
+     */
     public static ObservableList<String> GetSongs(Document myDoc) {
         ObservableList<String> songList = FXCollections.observableArrayList();
         Elements myElements = myDoc.getElementsByClass("songLabel");
@@ -237,6 +287,11 @@ public class Main extends Application {
         return songList;
     }
 
+    /**
+     * Gets concert in document and instantiates Concert object
+     * @param myDoc Webpage based off of query
+     * @return List of Concert objects
+     */
     public static ObservableList<Concert> GetConcerts(Document myDoc){
         ObservableList<Concert> concertList = FXCollections.observableArrayList();
         Elements myElements = myDoc.getElementsByClass("col-xs-12 setlistPreview");

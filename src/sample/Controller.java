@@ -89,19 +89,28 @@ public class Controller {
     private Rectangle pageBackground;
 
     @FXML
+    private Button backFavorites;
+
+    /**
+     * Decrements pageCount object, then re-searches for matching artist page
+     */
+    @FXML
     void DecrementPageNum() {
         page.DecrementCount();
 
-        Document doc = Main.SearchArtist(artistField.getText(), page);
+        Document doc = Main.SearchSetlist(artistField.getText(), page);
         ObservableList<Concert> table = Main.GetConcerts(doc);
         InitializeConcertTable(table);
     }
 
+    /**
+     * Increments pageCount object, then re-searches for matching artist page
+     */
     @FXML
     void IncrementPageNum() {
         try {
             page.IncrementCount();
-            Document doc = Main.SearchArtist(artistField.getText(), page);
+            Document doc = Main.SearchSetlist(artistField.getText(), page);
             ObservableList<Concert> table = Main.GetConcerts(doc);
             InitializeConcertTable(table);
         }
@@ -116,18 +125,23 @@ public class Controller {
         page.ResetCount();
     }
 
+    /**
+     * Searches setlists based on artist or venue and fills table
+     */
     @FXML
     void SearchSetlists() {
-        Document doc = Main.SearchArtist(artistField.getText(), page);
+        Document doc = Main.SearchSetlist(artistField.getText(), page);
         ObservableList<Concert> table = Main.GetConcerts(doc);
         InitializeConcertTable(table);
         page.setLastPage(Main.GetLastPage(doc));
     }
 
-
+    /**
+     * Adds artist to favorites if not already there, then adds to database
+     */
     @FXML
     void SaveArtist() {
-        String artistName = artistLabel.getText();
+         String artistName = artistLabel.getText();
          ArrayList<String> favoriteArtists = Main.ReadArtistDatabase();
 
         if (!favoriteArtists.contains(artistName)){
@@ -140,6 +154,9 @@ public class Controller {
         }
     }
 
+    /**
+     * Adds venue to favorites if not already there, then adds to database
+     */
     @FXML
     void SaveVenue() {
         String venue = concertTable.getSelectionModel().getSelectedItem().venueProperty().getValue();
@@ -169,8 +186,12 @@ public class Controller {
         pageLabel.setVisible(false);
         backPageButton.setVisible(false);
         nextPageButton.setVisible(false);
+        backFavorites.setVisible(false);
     }
 
+    /**
+     * Reads database and fills tables with favorites
+     */
     @FXML
     void ShowFavoritesTab() {
         tabPane.getSelectionModel().select(favoritesTab);
@@ -181,6 +202,9 @@ public class Controller {
 
     }
 
+    /**
+     * @param list List of Concert objects
+     */
     private void InitializeConcertTable(ObservableList<Concert> list){
         concertTable.getItems().clear();
         InitializePageLabel();
@@ -238,38 +262,52 @@ public class Controller {
         }
     }
 
+    /**
+     * Searches setlist based favorite artist table and fills concert table
+     * @param event Used to see if user double-clicked with left mouse button
+     */
     @FXML
     void SearchArtists(MouseEvent event) {
         if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) { //Needs a double click from the left mouse button
             ShowSearchTab();
-            Document doc = Main.SearchArtist(favArtistTable.getSelectionModel().getSelectedItem(), page);
+            Document doc = Main.SearchSetlist(favArtistTable.getSelectionModel().getSelectedItem(), page);
             ObservableList<Concert> table = Main.GetConcerts(doc);
             InitializeConcertTable(table);
             page.setLastPage(Main.GetLastPage(doc));
             tabPane.getSelectionModel().select(searchTab);
             artistField.setText(favArtistTable.getSelectionModel().getSelectedItem());
-
+            backFavorites.setVisible(true);
         }
     }
 
+
+    /**
+     * Searches setlist based on favorite venue and fills concert table
+     * @param event Used to see if user double-clicked with left mouse button
+     */
     @FXML
     void SearchVenues(MouseEvent event) {
         if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) { //Needs a double click from the left mouse button
             ShowSearchTab();
-            Document doc = Main.SearchArtist(favVenueTable.getSelectionModel().getSelectedItem(), page);
+            Document doc = Main.SearchSetlist(favVenueTable.getSelectionModel().getSelectedItem(), page);
             ObservableList<Concert> table = Main.GetConcerts(doc);
             InitializeConcertTable(table);
             page.setLastPage(Main.GetLastPage(doc));
             artistField.setText(favVenueTable.getSelectionModel().getSelectedItem());
+            backFavorites.setVisible(true);
         }
     }
 
-        @FXML
+    /**
+     * Searches setlist based on user input from text box, fills table, and sets artist image
+     * @param event Used to see if user double-clicked with left mouse button
+     */
+    @FXML
     void SelectConcert(MouseEvent event) {
         if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) { //Needs a double click from the left mouse button
             String date = concertTable.getSelectionModel().getSelectedItem().dateProperty().getValue();
             String artist = concertTable.getSelectionModel().getSelectedItem().artistProperty().getValue();
-            Document oldDoc = Main.SearchArtist(artistField.getText(), page);
+            Document oldDoc = Main.SearchSetlist(artistField.getText(), page);
             Document newDoc;
             ObservableList<String> songTable;
             newDoc = Main.GetConcertByDate(date, artist, oldDoc);

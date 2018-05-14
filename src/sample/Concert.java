@@ -2,6 +2,9 @@ package sample;
 
 import javafx.beans.property.SimpleStringProperty;
 
+/**
+ * Concert object to put into setlist table
+ */
 public class Concert {
 
     private final SimpleStringProperty artist;

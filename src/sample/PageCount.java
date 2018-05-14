@@ -1,5 +1,8 @@
 package sample;
 
+/**
+ * Keeps track of current page count for back and forward buttons
+ */
 public class PageCount {
 
     private int count;
